@@ -1,14 +1,27 @@
-<div class="container">
-    <div class="card">
-      <p>Move the mouse! Be the light bulb! Moving the glare around wasn't too difficult.</p>
-      <button class="fancy-button">Ooh, shiny!</button>
-    </div>
-    <div class="card">
-      <p>Shadows could be more physics-realistic... but this implementation works pretty well!</p>
-      <button class="fancy-button">Adding a little more depth...</button>
-    </div>
-    <div class="card">
-      <p>I didn't want to use the default button outline to indicate clicking, so I picked a new color.</p>
-      <button class="fancy-button">Still works!</button>
-    </div>
-  </div>
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="dynamic-lighted-buttons-style.css" />
+  </head>
+  <body>
+    <div class="container">
+        <div class="card">
+          <p>Be the light bulb! The background lighting follows the cursor, while the button lighting moves as far as the edge of each button.</p>
+          <button class="fancy-button">Move the mouse!</button>
+        </div>
+        <div class="card">
+          <p>The button lighting is meant to look relatively sharp. The shadows around each button are directionally opposite the mouse cursor, and they diffuse more as the distance to the cursor increases.</p>
+          <button class="fancy-button">Moving shadows!</button>
+        </div>
+        <div class="card">
+          <p>The effect is more pronounced when buttons are closer together.</p>
+          <button class="fancy-button">Button A</button>
+          <button class="fancy-button">Button 2</button>
+          <button class="fancy-button">Button iii</button>
+          <button class="fancy-button">Lighted cursor!</button>
+        </div>
+      </div>
+      <script src="./dynamic-lighted-buttons-script.js"></script>
+  </body>
+</html>
