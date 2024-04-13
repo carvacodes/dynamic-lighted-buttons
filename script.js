@@ -81,7 +81,7 @@ window.addEventListener('resize', function(){
 function setBackgroundGradient(mousemoveEvent) {
   let x = mousemoveEvent.clientX;
   let y = mousemoveEvent.clientY;
-  document.body.style.backgroundImage = defineRadialGradient('#cea', '#cae', '1400px', x + 'px ' + y + 'px');
+  document.body.style.backgroundImage = defineRadialGradient('#cea', '#cae', '500px', x + 'px ' + y + 'px');
 }
 
 function setButtonGradient(proxy, mousemoveEvent) {

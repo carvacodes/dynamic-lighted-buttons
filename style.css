@@ -32,17 +32,19 @@ p {
 
 .container {
   text-align: center;
-  width: 880px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .card {
-  display: inline-block;
-  width: 300px;
-  margin: 20px auto;
+  flex: 0 10px;
+  min-width: 300px;
+  margin: 10px auto;
   padding: 40px;
   border: thin solid #88f;
   border-radius: 15px;
   text-align: center;
+  min-height: 240px;
 }
 
 /*# sourceMappingURL=style.css.map */
