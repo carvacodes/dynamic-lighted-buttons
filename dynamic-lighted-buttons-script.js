@@ -101,8 +101,6 @@ function setButtonGradient(proxy, mousemoveEvent) {
   let shadowXOffset = (-0.015 * (x - rCenterX)) + 'px';
   let shadowYOffset = (-0.015 * (y - rCenterY)) + 'px';
 
-  console.log(rCenterX, rCenterY, shadowXOffset, shadowYOffset, x, y)
-  
   // update the shadow blur radius when the mouse is far away: less blurred and darker when the mouse is nearby
   let centerX = (r.left + r.right) / 2;
   let centerY = (r.top + r.bottom) / 2;
@@ -111,7 +109,6 @@ function setButtonGradient(proxy, mousemoveEvent) {
   let shadowDepth = Math.abs(0.85 - (distToMouse / 3000));
   proxy.style.boxShadow = shadowXOffset + ' ' + shadowYOffset + ' ' + shadowDispersion + ' ' + shadowDispersion + ' rgba(0,0,0,' + shadowDepth + ')';
 
-  // console.log(distToMouse, shadowXOffset, shadowYOffset, shadowDepth, shadowDispersion)
 }
 
 function defineLinearGradient(startColor, endColor, direction) {
