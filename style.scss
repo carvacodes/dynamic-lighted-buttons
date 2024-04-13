@@ -9,6 +9,7 @@ body {
     background-image: linear-gradient(to top left, #daf,#dfa);
     font-family: 'Boogaloo', 'Calibri', 'Verdana', sans-serif;
     font-size: 1.2rem;
+    overflow: hidden;
   }
   .fancy-button {
     font-family: 'Baloo 2', 'Calibri', 'Verdana', sans-serif;
@@ -31,7 +32,7 @@ body {
     width: 880px;
   }
   .card {
-    display: block;
+    display: inline-block;
     width: 300px;
     margin: 20px auto;
     padding: 40px;
