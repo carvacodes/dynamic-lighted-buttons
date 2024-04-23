@@ -1,101 +1,121 @@
-let buttons = document.getElementsByClassName('fancy-button');    // get the buttons HTMLCollection - an array-like list of the fancy buttons on this page
-let b = [].slice.call(buttons);   // set up an array that will hold the elements
-let proxies = [];   // this array will hold the proxy elements that will actually have the dynamic background color and shadow
-
-let primaryButtonColor = '#77c';    // light blue-ish main color for the button
-let hoverColor = '#33a';
-let primaryHighlightColor = 'rgba(255,255,255,0.1)';    // semi-transparent white color as the highlight
+let primaryButtonColor = '#226';    // light blue-ish main color for the button
+let hoverColor = '#55c';
+let primaryHighlightColor = 'rgba(225,225,255,0.5)';    // semi-transparent white color as the highlight
+let lightColor = '#cea';
+let bgColor = '';
 let activeColor = 'rgba(0,255,0,0.4)';
+let b = [];
 
-// to begin, iterate through each button on the page and create a proxy element that will sit behind it
-b.forEach(function(button){
-  button.style.backgroundColor = 'transparent';     // set each actual button's color to transparent to show the proxy and still allow button interaction
-  button.style.outline = 'none';
-  let buttonStyle = window.getComputedStyle(button);
+window.addEventListener('load', () => {
+  bgColor = window.getComputedStyle(document.body).backgroundColor;
 
-  // create the proxy elements
-  let el = document.createElement('DIV');
-  el.currentColor = primaryButtonColor;
-  el.currentGlareColor = primaryHighlightColor;
-  el.activeColor = activeColor;
-  el.clicked = false;  
-  el.style.boxShadow = 'rgba(0,0,0,0.4) 5px 5px 5px';
-  el.style.height = getTrimmedComputedStyle(button, 'height') + 'px';
-  el.style.width = getTrimmedComputedStyle(button, 'width') + getTrimmedComputedStyle(button, 'paddingLeft') + getTrimmedComputedStyle(button, 'paddingRight') + 'px';
-  el.style.position = 'relative';
-  el.style.left = 0;
-  el.style.top = getTrimmedComputedStyle(button, 'marginTop') * -1 + 'px';
-  el.style.borderRadius = buttonStyle.borderRadius;
-  el.style.backgroundImage = defineRadialGradient(primaryHighlightColor, primaryButtonColor, 'farthest-side', '10px 10px');
-  el.style.zIndex = -1000;    // since the cards are transparent, arbitrarily low z-indices are okay. would need to use a better z-index for a card with a background color
-  button.proxyElement = el;   // important! save a reference to the proxy on the real button. this will be useful for handling window resizing.
+  let buttons = document.getElementsByClassName('fancy-button');    // get the buttons HTMLCollection - an array-like list of the fancy buttons on this page
+  b = [].slice.call(buttons);   // set up an array that will hold the elements
 
-  // set up event handling for mouse enter/leave/click
-  button.addEventListener('mouseenter', function(){
-    this.proxyElement.currentColor = this.proxyElement.clicked ? primaryButtonColor : hoverColor;
-  });
-  button.addEventListener('mouseleave', function(){
-    this.proxyElement.currentColor = primaryButtonColor;
-    if (!this.proxyElement.clicked) {
-      this.style.backgroundColor = 'transparent';
-    }
-  });
-  button.addEventListener('mousedown', function(){
-    this.proxyElement.clicked = true;
-    this.proxyElement.style.backgroundImage = 'unset';
-    this.proxyElement.style.backgroundColor = this.proxyElement.activeColor;
-    this.style.color = 'black';
-  });
-  button.addEventListener('mouseup', function(e){
-    this.style.backgroundColor = 'transparent';
-    this.style.color = 'white';
-    this.proxyElement.clicked = false;
-    setButtonGradient(this.proxyElement, e);
+  // iterate through each button on the page and set relevant values for a default light source positioning
+  b.forEach(function(button){
+    let buttonStyle = window.getComputedStyle(button);
+
+    button.currentColor = primaryButtonColor;
+    button.currentGlareColor = primaryHighlightColor;
+    button.activeColor = activeColor;
+    button.clicked = false;  
+    button.style.boxShadow = 'rgba(0,0,0,0.4) 5px 5px 5px';
+    button.style.backgroundImage = defineRadialGradient(primaryHighlightColor, primaryButtonColor, 'farthest-side', '10px 10px');
+
+    // set up event handling for mouse enter/leave/click
+    button.addEventListener('mouseenter', function(){
+      this.currentColor = this.clicked ? primaryButtonColor : hoverColor;
+    });
+
+    button.addEventListener('mouseleave', function(){
+      this.currentColor = primaryButtonColor;
+      if (!this.clicked) {
+        this.style.backgroundColor = 'transparent';
+      }
+    });
   });
 
-  button.appendChild(el);    // append proxy to the document body
+    ////////////////////////////////////
+   //        Event Listeners         //
+  ////////////////////////////////////
+  window.addEventListener('mousedown', handleMouseDownLikeEvents);
+  window.addEventListener('touchstart', handleMouseDownLikeEvents);
+
+  window.addEventListener('mouseup', handleMouseUpLikeEvents);
+  window.addEventListener('touchend', handleMouseUpLikeEvents);
+
+  window.addEventListener('mousemove', handleMoveEvents);
+  window.addEventListener('touchmove', handleMoveEvents, {passive: false});
   
-  proxies.push(el);   // store the proxy element in the proxies array
+  window.addEventListener('resize', handleResize);
 });
 
-window.addEventListener('mouseup', function(){
+  ////////////////////////////////////
+ //         Event Handlers         //
+////////////////////////////////////
+
+// swap the button colors when clicked or tapped
+function handleMouseDownLikeEvents(e) {
+  if (e.target.classList.contains('fancy-button')) {
+    e.target.clicked = true;
+    e.target.style.backgroundImage = 'unset';
+    e.target.style.backgroundColor = e.target.activeColor;
+    e.target.style.color = 'black';
+  }
+}
+
+function handleMouseUpLikeEvents(e) {
   b.forEach(function(button){
     button.style.backgroundColor = 'transparent';
     button.style.color = 'white';
-    button.proxyElement.clicked = false;
+    button.clicked = false;
   });
-});
 
-// update the proxies' colors and shadows on mouse move events
-window.addEventListener('mousemove', function(e){
+  if (e.target.classList.contains('fancy-button')) {
+    e.target.style.color = 'white';
+    e.target.clicked = false;
+    setButtonGradient(e.target, e);
+  }
+}
+
+// update the buttons' colors and shadows on mouse move events
+function handleMoveEvents(e) {
+  if (e.changedTouches) {
+    e.preventDefault();
+    e = e.touches[0];
+  }
   setBackgroundGradient(e);
-  proxies.forEach((p) => setButtonGradient(p, e));
-});
+  b.forEach((p) => setButtonGradient(p, e));
+}
 
 // handle window resizing
-window.addEventListener('resize', function(){
+function handleResize() {
   document.body.style.height = '100vh';
-  document.body.style.width = '100vw';
-});
+}
+  
+  ////////////////////////////////////
+ //           Functions            //
+////////////////////////////////////
 
 function setBackgroundGradient(mousemoveEvent) {
   let x = mousemoveEvent.clientX;
   let y = mousemoveEvent.clientY;
-  document.body.style.backgroundImage = defineRadialGradient('#cea', '#cae', '500px', x + 'px ' + y + 'px');
+  document.body.style.backgroundImage = defineRadialGradient(lightColor, bgColor, '500px', x + 'px ' + y + 'px');
 }
 
-function setButtonGradient(proxy, mousemoveEvent) {
-  if (proxy.clicked) { return; }
+function setButtonGradient(button, mousemoveEvent) {
+  if (button.clicked) { return; }
   let x = mousemoveEvent.clientX;
   let y = mousemoveEvent.clientY;
   
   // first, the highlight reflection. set to the extreme side if the mouse is past the button, or follow the mouse cursor if inside the button
-  let r = proxy.getBoundingClientRect();
+  let r = button.getBoundingClientRect();
   let rCenterX = (r.left + r.right) / 2;
   let rCenterY = (r.top + r.bottom) / 2;
   let highlightLeft = x < r.left ? 0 : (x > r.right ? r.width : x - r.left);
   let highlightTop = y < r.top ? 0 : (y > r.bottom ? r.height : y - r.top);
-  proxy.style.backgroundImage = defineRadialGradient(primaryHighlightColor, proxy.currentColor, 'farthest-side', highlightLeft + 'px ' + highlightTop + 'px');
+  button.style.backgroundImage = defineRadialGradient(primaryHighlightColor, button.currentColor, 'farthest-side', highlightLeft + 'px ' + highlightTop + 'px');
   
   // next, the shadow. update the position relative to the mouse cursor
   let shadowXOffset = (-0.015 * (x - rCenterX)) + 'px';
@@ -107,7 +127,7 @@ function setButtonGradient(proxy, mousemoveEvent) {
   let distToMouse = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
   let shadowDispersion = Math.abs(distToMouse / 200) + 'px';
   let shadowDepth = Math.abs(0.85 - (distToMouse / 3000));
-  proxy.style.boxShadow = shadowXOffset + ' ' + shadowYOffset + ' ' + shadowDispersion + ' ' + shadowDispersion + ' rgba(0,0,0,' + shadowDepth + ')';
+  button.style.boxShadow = shadowXOffset + ' ' + shadowYOffset + ' ' + shadowDispersion + ' ' + shadowDispersion + ' rgba(0,0,0,' + shadowDepth + ')';
 
 }
 
