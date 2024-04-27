@@ -22,18 +22,6 @@ window.addEventListener('load', () => {
     button.clicked = false;  
     button.style.boxShadow = 'rgba(0,0,0,0.4) 5px 5px 5px';
     button.style.backgroundImage = defineRadialGradient(primaryHighlightColor, primaryButtonColor, 'farthest-side', '10px 10px');
-
-    // set up event handling for mouse enter/leave/click
-    button.addEventListener('mouseenter', function(){
-      this.currentColor = this.clicked ? primaryButtonColor : hoverColor;
-    });
-
-    button.addEventListener('mouseleave', function(){
-      this.currentColor = primaryButtonColor;
-      if (!this.clicked) {
-        this.style.backgroundColor = 'transparent';
-      }
-    });
   });
 
     ////////////////////////////////////
@@ -69,33 +57,32 @@ function handleMouseDownLikeEvents(e) {
 
   if (t.classList.contains('fancy-button')) {
     t.clicked = true;
-    t.style.backgroundImage = 'unset';
-    t.style.backgroundColor = t.activeColor;
-    t.style.color = 'black';
+    t.classList.add('active');
+    setButtonGradient(t, event);
   }
+  
+  setBackgroundGradient(event);
 }
 
 function handleMouseUpLikeEvents(e) {
-  let event;
   if (e.changedTouches) {
     e.preventDefault();
-    event = e.touches[0];
-  } else {
-    event = e;
   }
 
   b.forEach(function(button){
-    button.style.backgroundColor = 'transparent';
-    button.style.color = 'white';
     button.clicked = false;
+    button.classList.remove('active');
   });
 
-  let t = event.target;
+  let t = e.target;
+
+  e.clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+  e.clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
 
   if (t.classList.contains('fancy-button')) {
-    t.style.color = 'white';
     t.clicked = false;
     setButtonGradient(t, e);
+    setBackgroundGradient(e);
   }
 }
 
@@ -104,7 +91,7 @@ function handleMoveEvents(e) {
   let event;
   if (e.changedTouches) {
     e.preventDefault();
-    event = e.touches[0];
+    event = e.changedTouches[0];
   } else {
     event = e;
   }
@@ -129,7 +116,7 @@ function setBackgroundGradient(moveEvent) {
 }
 
 function setButtonGradient(button, moveEvent) {
-  if (button.clicked) { return; }
+  // if (button.clicked) { return; }
   let x = moveEvent.clientX;
   let y = moveEvent.clientY;
   
@@ -139,7 +126,12 @@ function setButtonGradient(button, moveEvent) {
   let rCenterY = (r.top + r.bottom) / 2;
   let highlightLeft = x < r.left ? 0 : (x > r.right ? r.width : x - r.left);
   let highlightTop = y < r.top ? 0 : (y > r.bottom ? r.height : y - r.top);
-  button.style.backgroundImage = defineRadialGradient(primaryHighlightColor, button.currentColor, 'farthest-side', highlightLeft + 'px ' + highlightTop + 'px');
+  if (button.clicked) {
+    button.style.backgroundImage = 'unset';
+  } else {
+    button.style.backgroundImage = defineRadialGradient(primaryHighlightColor, button.currentColor, 'farthest-side', highlightLeft + 'px ' + highlightTop + 'px');
+  }
+
   
   // next, the shadow. update the position relative to the mouse cursor
   let shadowXOffset = (-0.015 * (x - rCenterX)) + 'px';

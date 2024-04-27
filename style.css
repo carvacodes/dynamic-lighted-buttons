@@ -18,9 +18,15 @@ body {
   margin: 10px;
   height: 40px;
   min-width: 80px;
-  color: #eaeafa;
   cursor: pointer;
   text-shadow: rgba(0, 0, 0, 0.8) 0px 0px 3px;
+  color: #eaeafa;
+}
+
+.fancy-button.active {
+  background-image: unset;
+  background-color: rgba(0,255,0,0.4);
+  color: black;
 }
 
 p {
