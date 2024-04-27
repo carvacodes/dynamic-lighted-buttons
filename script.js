@@ -40,10 +40,10 @@ window.addEventListener('load', () => {
    //        Event Listeners         //
   ////////////////////////////////////
   window.addEventListener('mousedown', handleMouseDownLikeEvents);
-  window.addEventListener('touchstart', handleMouseDownLikeEvents);
+  window.addEventListener('touchstart', handleMouseDownLikeEvents, {passive: false});
 
   window.addEventListener('mouseup', handleMouseUpLikeEvents);
-  window.addEventListener('touchend', handleMouseUpLikeEvents);
+  window.addEventListener('touchend', handleMouseUpLikeEvents, {passive: false});
 
   window.addEventListener('mousemove', handleMoveEvents);
   window.addEventListener('touchmove', handleMoveEvents, {passive: false});
@@ -57,57 +57,81 @@ window.addEventListener('load', () => {
 
 // swap the button colors when clicked or tapped
 function handleMouseDownLikeEvents(e) {
-  if (e.target.classList.contains('fancy-button')) {
-    e.target.clicked = true;
-    e.target.style.backgroundImage = 'unset';
-    e.target.style.backgroundColor = e.target.activeColor;
-    e.target.style.color = 'black';
+  let event;
+  if (e.changedTouches) {
+    e.preventDefault();
+    event = e.touches[0];
+  } else {
+    event = e;
+  }
+
+  let t = event.target;
+
+  if (t.classList.contains('fancy-button')) {
+    t.clicked = true;
+    t.style.backgroundImage = 'unset';
+    t.style.backgroundColor = t.activeColor;
+    t.style.color = 'black';
   }
 }
 
 function handleMouseUpLikeEvents(e) {
+  let event;
+  if (e.changedTouches) {
+    e.preventDefault();
+    event = e.touches[0];
+  } else {
+    event = e;
+  }
+
   b.forEach(function(button){
     button.style.backgroundColor = 'transparent';
     button.style.color = 'white';
     button.clicked = false;
   });
 
-  if (e.target.classList.contains('fancy-button')) {
-    e.target.style.color = 'white';
-    e.target.clicked = false;
-    setButtonGradient(e.target, e);
+  let t = event.target;
+
+  if (t.classList.contains('fancy-button')) {
+    t.style.color = 'white';
+    t.clicked = false;
+    setButtonGradient(t, e);
   }
 }
 
 // update the buttons' colors and shadows on mouse move events
 function handleMoveEvents(e) {
+  let event;
   if (e.changedTouches) {
     e.preventDefault();
-    e = e.touches[0];
+    event = e.touches[0];
+  } else {
+    event = e;
   }
-  setBackgroundGradient(e);
-  b.forEach((p) => setButtonGradient(p, e));
+
+  setBackgroundGradient(event);
+  b.forEach((p) => setButtonGradient(p, event));
 }
 
 // handle window resizing
 function handleResize() {
-  document.body.style.height = '100vh';
+  document.body.style.minHeight = '100vh';
 }
   
   ////////////////////////////////////
  //           Functions            //
 ////////////////////////////////////
 
-function setBackgroundGradient(mousemoveEvent) {
-  let x = mousemoveEvent.clientX;
-  let y = mousemoveEvent.clientY;
+function setBackgroundGradient(moveEvent) {
+  let x = moveEvent.clientX;
+  let y = moveEvent.clientY;
   document.body.style.backgroundImage = defineRadialGradient(lightColor, bgColor, '500px', x + 'px ' + y + 'px');
 }
 
-function setButtonGradient(button, mousemoveEvent) {
+function setButtonGradient(button, moveEvent) {
   if (button.clicked) { return; }
-  let x = mousemoveEvent.clientX;
-  let y = mousemoveEvent.clientY;
+  let x = moveEvent.clientX;
+  let y = moveEvent.clientY;
   
   // first, the highlight reflection. set to the extreme side if the mouse is past the button, or follow the mouse cursor if inside the button
   let r = button.getBoundingClientRect();
